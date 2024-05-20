@@ -44,13 +44,14 @@ client.get("/", async (c) => {
   const countClass = css`
     font-family: "Yantramanav", sans-serif;
     font-weight: bold;
-    font-size: 4em;
+    font-size: 5em;
     line-height: 1.1em;
     color: white;
-    margin-top: 15px;
+    padding: 5px;
   `;
   const buttonClass = css`
     font-family: "Inter", sans-serif;
+    font-size: 0.9em;
     background-color: orange;
     border: none;
     padding: 5px;
@@ -68,8 +69,8 @@ client.get("/", async (c) => {
       <img
         src="/static/ToastedToast.png"
         alt="ToastedToast"
-        width={90}
-        height={90}
+        width={100}
+        height={100}
       />
       <p class={cx(countClass, "odometer")} id="count">
         {clicks}
