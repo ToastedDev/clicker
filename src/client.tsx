@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { Style, css } from "hono/css";
+import { Style, css, cx } from "hono/css";
 import { jsxRenderer } from "hono/jsx-renderer";
 import { getClicks } from "./lib/db";
 import { useState } from "hono/jsx";
@@ -12,9 +12,11 @@ client.get(
     <html lang="en">
       <head>
         <link rel="stylesheet" href="/static/odometer.css" />
+        <script src="/static/odometer.js" />
+        <script src="/static/script.js" />
         <Style>
           {css`
-            @import url("https://fonts.googleapis.com/css2?family=Yantramanav:wght@700&display=swap");
+            @import url("https://fonts.googleapis.com/css2?family=Yantramanav:wght@700&family=Inter:wght@100..900&display=swap");
 
             * {
               padding: 0;
@@ -28,26 +30,9 @@ client.get(
   ))
 );
 
-async function Counter() {
-  const clicks = await getClicks();
-  const [count, setCount] = useState(clicks);
-  const countClass = css`
-    font-family: "Yantramanav", sans-serif;
-    font-weight: bold;
-    font-size: 4em;
-    line-height: 1.1em;
-    color: white;
-    padding-top: 15px;
-  `;
-
-  return (
-    <>
-      <p class={countClass}>{count}</p>
-    </>
-  );
-}
-
 client.get("/", async (c) => {
+  const clicks = await getClicks();
+
   const mainClass = css`
     min-height: 100vh;
     display: flex;
@@ -55,6 +40,27 @@ client.get("/", async (c) => {
     align-items: center;
     justify-content: center;
     background: black;
+  `;
+  const countClass = css`
+    font-family: "Yantramanav", sans-serif;
+    font-weight: bold;
+    font-size: 4em;
+    line-height: 1.1em;
+    color: white;
+    margin-top: 15px;
+  `;
+  const buttonClass = css`
+    font-family: "Inter", sans-serif;
+    background-color: orange;
+    border: none;
+    padding: 5px;
+    border-radius: 0.5em;
+    margin-top: 5px;
+    transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    &:hover {
+      cursor: pointer;
+      opacity: 0.8;
+    }
   `;
 
   return c.render(
@@ -65,7 +71,12 @@ client.get("/", async (c) => {
         width={90}
         height={90}
       />
-      <Counter />
+      <p class={cx(countClass, "odometer")} id="count">
+        {clicks}
+      </p>
+      <button class={buttonClass} id="increment">
+        +1
+      </button>
     </main>
   );
 });
