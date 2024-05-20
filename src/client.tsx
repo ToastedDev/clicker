@@ -29,12 +29,14 @@ client.get(
 );
 
 function Counter({ initialCount }: { initialCount: number }) {
-  const [count, setCount] = useState(initialCount);
+  const [count, setCount] = useState(1_000_000);
   const countClass = css`
     font-family: "Yantramanav", sans-serif;
     font-weight: bold;
-    font-size: 3em;
+    font-size: 4em;
+    line-height: 1.1em;
     color: white;
+    padding-top: 15px;
   `;
 
   return (
@@ -51,7 +53,6 @@ client.get("/", async (c) => {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    gap: 10px;
     align-items: center;
     justify-content: center;
     background: black;
@@ -62,8 +63,8 @@ client.get("/", async (c) => {
       <img
         src="/static/ToastedToast.png"
         alt="ToastedToast"
-        width={80}
-        height={80}
+        width={90}
+        height={90}
       />
       <Counter initialCount={clicks} />
     </main>
