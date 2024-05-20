@@ -28,8 +28,9 @@ client.get(
   ))
 );
 
-function Counter({ initialCount }: { initialCount: number }) {
-  const [count, setCount] = useState(1_000_000);
+async function Counter() {
+  const clicks = await getClicks();
+  const [count, setCount] = useState(clicks);
   const countClass = css`
     font-family: "Yantramanav", sans-serif;
     font-weight: bold;
@@ -47,8 +48,6 @@ function Counter({ initialCount }: { initialCount: number }) {
 }
 
 client.get("/", async (c) => {
-  const clicks = await getClicks();
-
   const mainClass = css`
     min-height: 100vh;
     display: flex;
@@ -66,7 +65,7 @@ client.get("/", async (c) => {
         width={90}
         height={90}
       />
-      <Counter initialCount={clicks} />
+      <Counter />
     </main>
   );
 });
