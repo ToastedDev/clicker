@@ -1,12 +1,21 @@
 import { Hono } from "hono";
 import { client } from "./client";
-import { getClicks } from "./lib/db";
+import { getClicks, incrementClicks } from "./lib/db";
+import { serveStatic } from "hono/bun";
+import { jsxRenderer } from "hono/jsx-renderer";
 
 const app = new Hono();
+
+app.get("/static/*", serveStatic({ root: "./" }));
 
 app.get("/clicks", async (c) => {
   const clicks = await getClicks();
   return c.json({ clicks });
+});
+
+app.post("/clicks", async (c) => {
+  await incrementClicks();
+  return new Response(null, { status: 204 });
 });
 
 app.route("/", client);

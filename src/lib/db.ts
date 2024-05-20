@@ -32,3 +32,9 @@ export async function getClicks() {
 
   return click.count;
 }
+
+export async function incrementClicks() {
+  await db
+    .query("UPDATE clicks SET count = count + 1 WHERE id = ?")
+    .get("toasted-clicker");
+}
