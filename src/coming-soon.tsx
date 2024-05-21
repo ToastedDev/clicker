@@ -26,6 +26,7 @@ app.get("/", (c) => {
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    text-align: center;
     border-radius: 0.5rem;
   `;
   const headingClass = css`
