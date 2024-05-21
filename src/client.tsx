@@ -231,13 +231,15 @@ client.get("/analytics", async (c) => {
           </svg>
           Go back to clicker
         </a>
-        <div class={cardClass}>
-          <div id="minutely-chart" />
-        </div>
+        {["minutely", "hourly", "daily"].map((chartType) => (
+          <div class={cardClass}>
+            <div id={`${chartType}-chart`} />
+          </div>
+        ))}
       </main>
       <script
         type="application/json"
-        id="analytics"
+        id="analytics-data"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify(
             analytics.map((datapoint) => [datapoint.createdAt, datapoint.count])
