@@ -5,7 +5,7 @@ import { Database } from "bun:sqlite";
 interface Meta {
   clicks: number;
   history: {
-    date: number;
+    date: string;
     count: number;
   }[];
   countries: {
@@ -34,7 +34,7 @@ async function initDatabase() {
           .query("SELECT * FROM history WHERE clicker_id = ?")
           .all("toasted-clicker") as any
       ).map(({ created_at, count }: any) => ({
-        date: new Date(created_at).getTime(),
+        date: new Date(created_at).toISOString(),
         count,
       })),
       countries: (
@@ -82,7 +82,7 @@ export async function getHistory() {
 }
 
 export async function addToHistory(clicks: number) {
-  db.history.push({ date: new Date().getTime(), count: clicks });
+  db.history.push({ date: new Date().toISOString(), count: clicks });
 }
 
 export async function getCountries() {
