@@ -134,3 +134,35 @@ createChart({
   title: "Daily Clicks",
   data: convertToDailyData(analyticsData),
 });
+
+// convert Date object to YYYY-MM-DD mm:hh:ss format
+function convertDate(date) {
+  return (
+    date.toISOString().slice(0, 10) + " " + date.toISOString().slice(11, 16)
+  );
+}
+
+document.getElementById("download-csv").addEventListener("click", () => {
+  const csvText =
+    "Date,Clicks\n" +
+    analyticsData
+      .map((entry) => [convertDate(new Date(entry[0])), entry[1]])
+      .join("\n");
+  downloadCSVFile(csvText, "ToastedClickerAnalytics.csv");
+});
+
+function downloadCSVFile(csvText, fileName) {
+  const blob = new Blob([csvText], { type: "text/csv;charset=utf-8;" });
+  const link = document.createElement("a");
+  if (link.download !== undefined) {
+    const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute("download", fileName);
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  } else {
+    window.open("data:text/csv;charset=utf-8," + encodeURIComponent(csvText));
+  }
+}

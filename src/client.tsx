@@ -216,28 +216,54 @@ client.get("/analytics", async (c) => {
             </h1>
           </div>
         </div>
-        <a
-          href="/"
-          class={buttonAsCardClass}
-          style="display: flex; flex-direction: row; align-items: center; gap: 0.25rem;"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            style="width: 1.25rem; height: 1.25rem; margin-right: 0.25rem;"
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <a
+            href="/"
+            class={buttonAsCardClass}
+            style="display: flex; flex-direction: row; align-items: center; gap: 0.25rem;"
           >
-            <path d="m12 19-7-7 7-7" />
-            <path d="M19 12H5" />
-          </svg>
-          Go back to clicker
-        </a>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              style="width: 1.25rem; height: 1.25rem; margin-right: 0.25rem;"
+            >
+              <path d="m12 19-7-7 7-7" />
+              <path d="M19 12H5" />
+            </svg>
+            Go back to clicker
+          </a>
+          <button
+            href="/"
+            id="download-csv"
+            class={buttonAsCardClass}
+            style="display: flex; flex-direction: row; align-items: center; gap: 0.25rem;"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              style="width: 1.25rem; height: 1.25rem; margin-right: 0.25rem;"
+            >
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" x2="12" y1="15" y2="3" />
+            </svg>
+            Download data as CSV
+          </button>
+        </div>
         {["minutely", "hourly", "daily"].map((chartType) => (
           <div class={cardClass}>
             <div id={`${chartType}-chart`} />
