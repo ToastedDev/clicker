@@ -82,7 +82,9 @@ export async function addToHistory(clicks: number) {
 
 export async function getCountries() {
   const countries = db
-    .query("SELECT * FROM country_clicks WHERE clicker_id = ?")
+    .query(
+      "SELECT * FROM country_clicks WHERE clicker_id = ? ORDER BY count DESC"
+    )
     .all("toasted-clicker") as CountryClick[];
   return countries;
 }
