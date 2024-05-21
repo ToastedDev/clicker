@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "start": "bun src/index.ts",
+    "coming-soon": "bun src/coming-soon.tsx",
     "dev": "bun --hot src/index.ts"
   },
   "dependencies": {
