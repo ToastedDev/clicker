@@ -1,6 +1,6 @@
 const analyticsData = JSON.parse(
   document.getElementById("analytics-data").textContent
-);
+).map(([date, count]) => [new Date(date).getTime(), count]);
 
 const createChart = ({ id, title = "", data }) =>
   new Highcharts.chart({
@@ -88,7 +88,7 @@ function convertToHourlyData(minuteData) {
   const result = Object.entries(hourlyData).map(([key, [time, value]]) => {
     const exactHourDate = new Date(time);
     exactHourDate.setUTCMinutes(0, 0, 0);
-    return [exactHourDate.toISOString(), value];
+    return [exactHourDate.getTime(), value];
   });
 
   return result;
@@ -111,7 +111,7 @@ function convertToDailyData(minuteData) {
   const result = Object.entries(dailyData).map(([key, [time, value]]) => {
     const exactDayDate = new Date(time);
     exactDayDate.setUTCHours(0, 0, 0, 0);
-    return [exactDayDate.toISOString(), value];
+    return [exactDayDate.getTime(), value];
   });
 
   return result;
