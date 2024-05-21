@@ -261,7 +261,7 @@ client.get("/analytics", async (c) => {
         id="analytics-data"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify(
-            analytics.map((datapoint) => [datapoint.createdAt, datapoint.count])
+            analytics.map((datapoint) => [datapoint.date, datapoint.count])
           ),
         }}
       />

@@ -1,108 +1,106 @@
-import { readFile, exists } from "node:fs/promises";
+import { exists } from "node:fs/promises";
 import { join } from "node:path";
 import { Database } from "bun:sqlite";
 
-interface Click {
-  id: string;
-  count: number;
+interface Meta {
+  clicks: number;
+  history: {
+    date: number;
+    count: number;
+  }[];
+  countries: {
+    id: string;
+    count: number;
+  }[];
 }
 
-interface ClickHistory {
-  id: number;
-  clicker_id: string;
-  created_at: string;
-  count: number;
-}
+const jsonDatabaseFile = join(process.cwd(), "data.json");
 
-interface CountryClick {
-  id: string;
-  clicker_id: string;
-  count: number;
-}
-
-async function createDatabase() {
-  const databaseFile = join(process.cwd(), "data.db");
-  if (await exists(databaseFile)) {
-    const db = new Database(databaseFile);
-    // to make sure this exists (for old dbs)
-    db.exec(`
-      CREATE TABLE IF NOT EXISTS country_clicks (
-        id TEXT PRIMARY KEY,
-        clicker_id TEXT NOT NULL,
-        count INTEGER NOT NULL DEFAULT 0
-      );
-      CREATE INDEX IF NOT EXISTS country_clicks_clicker_id_idx ON country_clicks (clicker_id);
-    `);
-    return db;
+async function initDatabase() {
+  const sqlDatabaseFile = join(process.cwd(), "data.db");
+  const dataFile = Bun.file(jsonDatabaseFile);
+  const jsonFileDoesNotExist =
+    !(await exists(jsonDatabaseFile)) ?? !dataFile.size;
+  if ((await exists(sqlDatabaseFile)) && jsonFileDoesNotExist) {
+    const db = new Database(sqlDatabaseFile);
+    const data: Meta = {
+      clicks: (
+        db
+          .query("SELECT count FROM clicks WHERE id = ?")
+          .get("toasted-clicker") as any
+      ).count,
+      history: (
+        db
+          .query("SELECT * FROM history WHERE clicker_id = ?")
+          .all("toasted-clicker") as any
+      ).map(({ created_at, count }: any) => ({
+        date: new Date(created_at).getTime(),
+        count,
+      })),
+      countries: (
+        db
+          .query(
+            "SELECT * FROM country_clicks WHERE clicker_id = ? ORDER BY count DESC"
+          )
+          .all("toasted-clicker") as any
+      ).map(({ id, count }: any) => ({
+        id,
+        count,
+      })),
+    };
+    await Bun.write(jsonDatabaseFile, JSON.stringify(data));
+    return;
   }
-
-  const db = new Database(databaseFile);
-  const sqlCommands = await readFile(join(process.cwd(), "init.sql"), "utf-8");
-  db.exec(sqlCommands);
-
-  return db;
+  if (jsonFileDoesNotExist) {
+    const data: Meta = {
+      clicks: 0,
+      history: [],
+      countries: [],
+    };
+    await Bun.write(jsonDatabaseFile, JSON.stringify(data));
+    return;
+  }
 }
 
-const db = await createDatabase();
+await initDatabase();
+
+const dataFIle = Bun.file(jsonDatabaseFile);
+const db: Meta = JSON.parse(
+  Buffer.from(await dataFIle.arrayBuffer()).toString()
+);
 
 export async function getClicks() {
-  const click = (await db
-    .query("SELECT count FROM clicks WHERE id = ?")
-    .get("toasted-clicker")) as Click | null;
-  if (!click) {
-    db.query("INSERT INTO clicks (id) VALUES (?)").all("toasted-clicker");
-    return 0;
-  }
-
-  return click.count;
+  return db.clicks;
 }
 
 export async function incrementClicks() {
-  await db
-    .query("UPDATE clicks SET count = count + 1 WHERE id = ?")
-    .get("toasted-clicker");
+  db.clicks += 1;
 }
 
 export async function getHistory() {
-  const history = db
-    .query("SELECT * FROM history WHERE clicker_id = ?")
-    .all("toasted-clicker") as ClickHistory[];
-
-  return history.map(({ created_at, count }) => ({
-    createdAt: new Date(created_at),
-    count,
-  }));
+  return db.history;
 }
 
 export async function addToHistory(clicks: number) {
-  db.query(
-    "INSERT INTO history (clicker_id, count) VALUES ($clickerId, $clicks)"
-  ).all({ $clickerId: "toasted-clicker", $clicks: clicks });
+  db.history.push({ date: new Date().getTime(), count: clicks });
 }
 
 export async function getCountries() {
-  const countries = db
-    .query(
-      "SELECT * FROM country_clicks WHERE clicker_id = ? ORDER BY count DESC"
-    )
-    .all("toasted-clicker") as CountryClick[];
-  return countries;
+  return db.countries;
 }
 
 export async function getCountry(country: string) {
-  const countryClick = db
-    .query(
-      "SELECT count FROM country_clicks WHERE clicker_id = $clickerId AND id = $country"
-    )
-    .get({
-      $clickerId: "toasted-clicker",
-      $country: country,
-    }) as CountryClick | null;
-  return countryClick;
+  return db.countries.find(({ id }) => id === country);
 }
 
 export async function addToCountryClicks(country: string) {
-  db.query(
-    "INSERT INTO country_clicks (clicker_id, id, count) VALUES ($clickerId, $country, 1) ON CONFLICT (id) DO UPDATE SET count = country_clicks.count + 1"
-  ).all({ $clickerId: "toasted-clicker", $country: country });
+  const index = db.countries.findIndex(({ id }) => id === country);
+  if (!index) {
+    db.countries.push({ id: country, count: 0 });
+  }
+  db.countries[index].count += 1;
 }
+
+setInterval(async () => {
+  await Bun.write(jsonDatabaseFile, JSON.stringify(db));
+}, 10_000);
