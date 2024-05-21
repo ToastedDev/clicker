@@ -22,8 +22,8 @@ const globalForCronJob = globalThis as unknown as {
   cronJob: CronJob | undefined;
 };
 
-// const cronJob =
-//   globalForCronJob.cronJob ??
-//   new CronJob("* * * * *", updateAnalytics, null, true, "Africa/Abidjan");
-// if (process.env.NODE_ENV !== "production") globalForCronJob.cronJob = cronJob;
-// cronJob.start();
+const cronJob =
+  globalForCronJob.cronJob ??
+  new CronJob("* * * * *", updateAnalytics, null, true, "Africa/Abidjan");
+if (process.env.NODE_ENV !== "production") globalForCronJob.cronJob = cronJob;
+cronJob.start();
