@@ -8,12 +8,37 @@ export function Layout({
   children: Child;
   title?: string;
 }) {
+  title = title ? `${title} — Toasted Clicker` : "Toasted Clicker";
+  const description = "The toastiest clicker in the world!";
   return (
     <html lang="en">
       <head>
-        <title>
-          {title ? `${title} — Toasted Clicker` : "Toasted Clicker"}
-        </title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width" />
+        <title>{title}</title>
+        <link rel="icon" type="image/svg+xml" href="/static/favicon.svg" />
+        <meta name="description" content={description} />
+        <meta
+          property="og:title"
+          content={title ? `${title} — ToastedToast` : "ToastedToast"}
+        />
+        <meta property="og:description" content={description} />
+        <meta property="og:url" content="https://toasted.is-a.dev/" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:creator" content="@ToastedDev" />
+        <meta name="twitter:creator:id" content="1145171094556426240" />
+        <meta
+          name="twitter:title"
+          content={title ? `${title} — ToastedToast` : "ToastedToast"}
+        />
+        <meta name="twitter:description" content={description} />
+        <meta property="og:image" content="https://toasted.is-a.dev/logo.png" />
+        <meta
+          name="twitter:image"
+          content="https://toasted.is-a.dev/logo.png"
+        />
+        <meta name="twitter:card" content="summary" />
+        <meta name="theme-color" content="#f97316" />
         <link rel="stylesheet" href="/static/odometer.css" />
         <script src="/static/odometer.js" />
         <script src="https://code.highcharts.com/10.3.3/highcharts.js" />
