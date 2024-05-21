@@ -7,7 +7,6 @@ const chart = new Highcharts.chart({
     backgroundColor: "transparent",
     plotBorderColor: "transparent",
     animation: false,
-    width: 800,
   },
   title: {
     text: "",

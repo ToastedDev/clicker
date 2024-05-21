@@ -20,6 +20,7 @@ client.get(
             * {
               padding: 0;
               margin: 0;
+              box-sizing: border-box;
             }
 
             body {
@@ -52,6 +53,10 @@ client.get(
 
             ::selection {
               background-color: rgb(249, 115, 22);
+            }
+
+            [data-highcharts-chart] {
+              width: 100%;
             }
           `}
         </Style>
@@ -89,9 +94,11 @@ const buttonAsCardClass = css`
   text-align: center;
   color: white;
   text-decoration: none;
+  border: none;
   transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
   &:hover {
     opacity: 0.8;
+    cursor: pointer;
   }
 `;
 

@@ -11,7 +11,6 @@ const createChart = ({ id, title = "", data }) =>
       backgroundColor: "transparent",
       plotBorderColor: "transparent",
       animation: false,
-      width: 800,
     },
     title: {
       text: title,
