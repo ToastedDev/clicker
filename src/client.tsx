@@ -53,6 +53,7 @@ const buttonAsCardClass = css`
   text-decoration: none;
   border: none;
   transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 1em;
   &:hover {
     opacity: 0.8;
     cursor: pointer;
