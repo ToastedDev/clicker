@@ -2,7 +2,6 @@ import { Hono } from "hono";
 import { Style, css, cx } from "hono/css";
 import { jsxRenderer } from "hono/jsx-renderer";
 import { getClicks } from "./lib/db";
-import { useState } from "hono/jsx";
 
 export const client = new Hono();
 
@@ -13,7 +12,7 @@ client.get(
       <head>
         <link rel="stylesheet" href="/static/odometer.css" />
         <script src="/static/odometer.js" />
-        <script src="/static/script.js" />
+        <script src="https://code.highcharts.com/10.3.3/highcharts.js" />
         <Style>
           {css`
             @import url("https://fonts.googleapis.com/css2?family=Yantramanav:wght@700&family=Inter:wght@100..900&display=swap");
@@ -22,10 +21,18 @@ client.get(
               padding: 0;
               margin: 0;
             }
+
+            body {
+              background: black;
+              min-height: 100vh;
+              display: flex;
+              flex-direction: column;
+            }
           `}
         </Style>
       </head>
       <body>{children}</body>
+      <script src="/static/script.js" />
     </html>
   ))
 );
@@ -34,12 +41,11 @@ client.get("/", async (c) => {
   const clicks = await getClicks();
 
   const mainClass = css`
-    min-height: 100vh;
+    flex-grow: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    background: black;
   `;
   const countClass = css`
     font-family: "Yantramanav", sans-serif;
@@ -78,6 +84,7 @@ client.get("/", async (c) => {
       <button class={buttonClass} id="increment">
         +1
       </button>
+      <div id="chart" />
     </main>
   );
 });
