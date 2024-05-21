@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { Style, css, cx } from "hono/css";
 import { jsxRenderer } from "hono/jsx-renderer";
-import { getClicks } from "./lib/db";
+import { getClicks, getHistory } from "./lib/db";
 
 export const client = new Hono();
 
@@ -182,11 +182,8 @@ client.get("/", async (c) => {
 });
 
 client.get("/analytics", async (c) => {
-  const analytics = [
-    {
-      hello: "world",
-    },
-  ];
+  const analytics = await getHistory();
+  console.log(analytics);
 
   return c.render(
     <>
@@ -236,11 +233,18 @@ client.get("/analytics", async (c) => {
           </svg>
           Go back to clicker
         </a>
+        <div class={cardClass}>
+          <div id="minutely-chart" />
+        </div>
       </main>
       <script
         type="application/json"
         id="analytics"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(analytics) }}
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(
+            analytics.map((datapoint) => [datapoint.createdAt, datapoint.count])
+          ),
+        }}
       />
       <script src="/static/analytics.js" />
     </>

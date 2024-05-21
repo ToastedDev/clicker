@@ -7,6 +7,13 @@ interface Click {
   count: number;
 }
 
+interface ClickHistory {
+  id: number;
+  clicker_id: string;
+  created_at: string;
+  count: number;
+}
+
 async function createDatabase() {
   const databaseFile = join(process.cwd(), "data.db");
   if (await exists(databaseFile)) return new Database(databaseFile);
@@ -26,7 +33,7 @@ export async function getClicks() {
     .query("SELECT count FROM clicks WHERE id = ?")
     .get("toasted-clicker")) as Click | null;
   if (!click) {
-    await db.query("INSERT INTO clicks (id) VALUES (?)").all("toasted-clicker");
+    db.query("INSERT INTO clicks (id) VALUES (?)").all("toasted-clicker");
     return 0;
   }
 
@@ -37,4 +44,21 @@ export async function incrementClicks() {
   await db
     .query("UPDATE clicks SET count = count + 1 WHERE id = ?")
     .get("toasted-clicker");
+}
+
+export async function getHistory() {
+  const history = db
+    .query("SELECT * FROM history WHERE clicker_id = ?")
+    .all("toasted-clicker") as ClickHistory[];
+
+  return history.map(({ created_at, count }) => ({
+    createdAt: new Date(created_at),
+    count,
+  }));
+}
+
+export async function addToHistory(clicks: number) {
+  db.query(
+    "INSERT INTO history (clicker_id, count) VALUES ($clickerId, $clicks)"
+  ).all({ $clickerId: "toasted-clicker", $clicks: clicks });
 }
