@@ -183,8 +183,6 @@ client.get("/", async (c) => {
 
 client.get("/analytics", async (c) => {
   const analytics = await getHistory();
-  console.log(analytics);
-
   return c.render(
     <>
       <main class={mainClass}>

@@ -62,7 +62,7 @@ const chart = new Highcharts.chart({
 });
 
 setInterval(() => {
-  fetch("/clicks")
+  fetch("/api/clicks")
     .then((res) => res.json())
     .then((data) => {
       document.getElementById("count").textContent = data.clicks;
@@ -74,7 +74,7 @@ setInterval(() => {
 }, 2000);
 
 document.getElementById("increment").addEventListener("click", () => {
-  fetch("/clicks", {
+  fetch("/api/clicks", {
     method: "POST",
   });
 });

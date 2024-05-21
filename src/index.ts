@@ -1,26 +1,16 @@
 import { Hono } from "hono";
 import { client } from "./client";
-import { getClicks, getHistory, incrementClicks } from "./lib/db";
 import { serveStatic } from "hono/bun";
-import { cors } from "hono/cors";
 import { CronJob } from "cron";
 import { updateAnalytics } from "./lib/analytics";
+import { api } from "./api";
 
 const app = new Hono();
 
 app.get("/static/*", serveStatic({ root: "./" }));
 
-app.get("/clicks", cors(), async (c) => {
-  const clicks = await getClicks();
-  return c.json({ clicks });
-});
-
-app.post("/clicks", async (c) => {
-  await incrementClicks();
-  return new Response(null, { status: 204 });
-});
-
 app.route("/", client);
+app.route("/api", api);
 
 const port = parseInt(process.env.PORT || "3000");
 export default {
