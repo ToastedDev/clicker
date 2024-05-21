@@ -86,7 +86,7 @@ export async function addToHistory(clicks: number) {
 }
 
 export async function getCountries() {
-  return db.countries;
+  return [...db.countries].sort((a, b) => b.count - a.count);
 }
 
 export async function getCountry(country: string) {
@@ -95,7 +95,7 @@ export async function getCountry(country: string) {
 
 export async function addToCountryClicks(country: string) {
   const index = db.countries.findIndex(({ id }) => id === country);
-  if (!index) {
+  if (index === -1) {
     db.countries.push({ id: country, count: 0 });
   }
   db.countries[index].count += 1;
