@@ -22,20 +22,23 @@ interface CountryClick {
 
 async function createDatabase() {
   const databaseFile = join(process.cwd(), "data.db");
-  if (await exists(databaseFile)) return new Database(databaseFile);
+  if (await exists(databaseFile)) {
+    const db = new Database(databaseFile);
+    // to make sure this exists (for old dbs)
+    db.exec(`
+      CREATE TABLE IF NOT EXISTS country_clicks (
+        id TEXT PRIMARY KEY,
+        clicker_id TEXT NOT NULL,
+        count INTEGER NOT NULL DEFAULT 0
+      );
+      CREATE INDEX IF NOT EXISTS country_clicks_clicker_id_idx ON country_clicks (clicker_id);
+    `);
+    return db;
+  }
 
   const db = new Database(databaseFile);
   const sqlCommands = await readFile(join(process.cwd(), "init.sql"), "utf-8");
   db.exec(sqlCommands);
-  // to make sure this exists (for old dbs)
-  db.exec(`
-    CREATE TABLE IF NOT EXISTS country_clicks (
-      id TEXT PRIMARY KEY,
-      clicker_id TEXT NOT NULL,
-      count INTEGER NOT NULL DEFAULT 0
-    );
-    CREATE INDEX IF NOT EXISTS country_clicks_clicker_id_idx ON country_clicks (clicker_id);
-  `);
 
   return db;
 }
