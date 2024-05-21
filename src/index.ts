@@ -12,6 +12,8 @@ app.get("/static/*", serveStatic({ root: "./" }));
 app.route("/", client);
 app.route("/api", api);
 
+app.notFound((c) => c.redirect("/"));
+
 const port = parseInt(process.env.PORT || "3000");
 export default {
   fetch: app.fetch,
