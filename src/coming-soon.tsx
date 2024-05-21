@@ -37,7 +37,7 @@ app.get("/", (c) => {
   `;
   const subheadingClass = css`
     font-family: "Inter", sans-serif;
-    font-size: 0.8em;
+    font-size: 1em;
     color: white;
     padding: 5px;
   `;
