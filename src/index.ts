@@ -2,13 +2,13 @@ import { Hono } from "hono";
 import { client } from "./client";
 import { getClicks, incrementClicks } from "./lib/db";
 import { serveStatic } from "hono/bun";
-import { jsxRenderer } from "hono/jsx-renderer";
+import { cors } from "hono/cors";
 
 const app = new Hono();
 
 app.get("/static/*", serveStatic({ root: "./" }));
 
-app.get("/clicks", async (c) => {
+app.get("/clicks", cors(), async (c) => {
   const clicks = await getClicks();
   return c.json({ clicks });
 });
