@@ -64,7 +64,7 @@ app.get("/", (c) => {
           </svg>
           <h1 class={headingClass}>Coming soon</h1>
           <p class={subheadingClass}>
-            This will be released soon. Check back later.
+            Toasted Clicker will be released soon. Check back later.
           </p>
         </div>
       </main>
