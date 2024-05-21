@@ -10,7 +10,9 @@ import {
 
 export const api = new Hono();
 
-api.get("/clicks", cors(), async (c) => {
+api.get("*", cors());
+
+api.get("/clicks", async (c) => {
   const clicks = await getClicks();
   return c.json({ clicks });
 });
@@ -30,7 +32,7 @@ api.post("/clicks", async (c) => {
   return new Response(null, { status: 204 });
 });
 
-api.get("/analytics", cors(), async (c) => {
+api.get("/analytics", async (c) => {
   const history = await getHistory();
   return c.json(history);
 });
