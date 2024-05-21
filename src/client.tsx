@@ -23,10 +23,35 @@ client.get(
             }
 
             body {
-              background: black;
+              background: rgb(67, 20, 7);
               min-height: 100vh;
               display: flex;
               flex-direction: column;
+            }
+
+            ::-webkit-scrollbar {
+              width: 8px;
+            }
+
+            ::-webkit-scrollbar-track {
+              background-color: rgb(67, 20, 7);
+            }
+
+            ::-webkit-scrollbar-thumb {
+              border-radius: 0.5rem;
+              background-color: rgb(249, 115, 22);
+            }
+
+            ::-webkit-scrollbar-thumb:hover {
+              background-color: #f97316bf;
+            }
+
+            ::-moz-selection {
+              background-color: rgb(249, 115, 22);
+            }
+
+            ::selection {
+              background-color: rgb(249, 115, 22);
             }
           `}
         </Style>
@@ -46,6 +71,21 @@ client.get("/", async (c) => {
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    gap: 1rem;
+    max-width: 48rem;
+    padding: 1rem;
+    margin-left: auto;
+    margin-right: auto;
+  `;
+  const cardClass = css`
+    background-color: #9a341280;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    border-radius: 0.5rem;
   `;
   const countClass = css`
     font-family: "Yantramanav", sans-serif;
@@ -58,7 +98,7 @@ client.get("/", async (c) => {
   const buttonClass = css`
     font-family: "Inter", sans-serif;
     font-size: 0.9em;
-    background-color: orange;
+    background-color: rgb(249, 115, 22);
     border: none;
     padding: 5px;
     border-radius: 0.5em;
@@ -72,19 +112,33 @@ client.get("/", async (c) => {
 
   return c.render(
     <main class={mainClass}>
-      <img
-        src="/static/ToastedToast.png"
-        alt="ToastedToast"
-        width={100}
-        height={100}
-      />
-      <p class={cx(countClass, "odometer")} id="count">
-        {clicks}
-      </p>
-      <button class={buttonClass} id="increment">
-        +1
-      </button>
-      <div id="chart" />
+      <div class={cardClass}>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width={80}
+          height={80}
+          viewBox="0 0 14 14"
+          style="color: rgb(249, 115, 22);"
+        >
+          <g fill="currentColor">
+            <path d="M9.5 4.5A2.5 2.5 0 0 0 7 2H2.5A2.5 2.5 0 0 0 1 6.5v5a1 1 0 0 0 1 1h5.5a1 1 0 0 0 1-1v-5a2.49 2.49 0 0 0 1-2"></path>
+            <path
+              fill-rule="evenodd"
+              d="M10.695 2.97a3.99 3.99 0 0 1-.226 3.525H13l.008-.001A2.49 2.49 0 0 0 14 4.5A2.5 2.5 0 0 0 11.5 2h-1.377c.235.294.428.62.572.97M13 7.743h-3V11.5a2.5 2.5 0 0 1-.209 1H12a1 1 0 0 0 1-1z"
+              clip-rule="evenodd"
+            ></path>
+          </g>
+        </svg>
+        <p class={cx(countClass, "odometer")} id="count">
+          {clicks}
+        </p>
+        <button class={buttonClass} id="increment">
+          +1
+        </button>
+      </div>
+      <div class={cardClass}>
+        <div id="chart" />
+      </div>
     </main>
   );
 });

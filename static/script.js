@@ -13,10 +13,38 @@ const chart = new Highcharts.chart({
     text: "",
   },
   xAxis: {
-    visible: false,
+    type: "datetime",
+    tickPixelInterval: 500,
+    labels: {
+      style: {
+        color: "#c2410c",
+        fontFamily: '"Inter", sans-serif',
+      },
+    },
+    gridLineColor: "#c2410c",
+    lineColor: "#c2410c",
+    minorGridLineColor: "#c2410c",
+    tickColor: "#c2410c",
+    title: {
+      style: {
+        color: "#c2410c",
+      },
+    },
   },
   yAxis: {
-    visible: false,
+    title: {
+      text: "",
+    },
+    labels: {
+      style: {
+        color: "#c2410c",
+        fontFamily: '"Inter", sans-serif',
+      },
+    },
+    gridLineColor: "#c2410c",
+    lineColor: "#c2410c",
+    minorGridLineColor: "#c2410c",
+    tickColor: "#c2410c",
   },
   credits: {
     enabled: false,
@@ -26,8 +54,8 @@ const chart = new Highcharts.chart({
       showInLegend: false,
       name: "",
       marker: { enabled: false },
-      color: "orange",
-      lineColor: "orange",
+      color: "rgb(249, 115, 22)",
+      lineColor: "rgb(249, 115, 22)",
       lineWidth: 4,
     },
   ],
