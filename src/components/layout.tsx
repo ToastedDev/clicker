@@ -81,6 +81,11 @@ export function Layout({
             [data-highcharts-chart] {
               width: 100%;
             }
+
+            .highcharts-reset-zoom {
+              border-radius: 8px;
+              box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            }
           `}
         </Style>
       </head>

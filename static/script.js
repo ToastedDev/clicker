@@ -4,9 +4,31 @@ const chart = new Highcharts.chart({
     renderTo: "chart",
     type: "line",
     zoomType: "x",
+    panning: true,
+    panKey: "shift",
+    animation: true,
     backgroundColor: "transparent",
     plotBorderColor: "transparent",
-    animation: false,
+    resetZoomButton: {
+      theme: {
+        fill: "#232323",
+        stroke: "rgb(249, 115, 22)",
+        r: 5,
+        style: {
+          color: "rgb(249, 115, 22)",
+          fontSize: "12px",
+          fontWeight: "bold",
+        },
+        states: {
+          hover: {
+            fill: "rgb(249, 115, 22)",
+            style: {
+              color: "#232323",
+            },
+          },
+        },
+      },
+    },
   },
   title: {
     text: "",
