@@ -16,7 +16,7 @@ interface Meta {
 const dataDir = join(process.cwd(), "data");
 
 const oldDatabaseFile = join(process.cwd(), "data.json");
-const databaseFile = join(dataDir, "data.json");
+const databaseFile = join(dataDir, "meta.json");
 const analyticsFile = join(dataDir, "analytics.csv");
 
 async function initDatabase() {
