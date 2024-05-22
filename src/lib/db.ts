@@ -1,6 +1,5 @@
-import { exists } from "node:fs/promises";
+import { exists, mkdir, appendFile } from "node:fs/promises";
 import { join } from "node:path";
-import { Database } from "bun:sqlite";
 
 interface Meta {
   clicks: number;
@@ -14,57 +13,47 @@ interface Meta {
   }[];
 }
 
-const jsonDatabaseFile = join(process.cwd(), "data.json");
+const dataDir = join(process.cwd(), "data");
+
+const oldDatabaseFile = join(process.cwd(), "data.json");
+const databaseFile = join(dataDir, "data.json");
+const analyticsFile = join(dataDir, "analytics.csv");
 
 async function initDatabase() {
-  const sqlDatabaseFile = join(process.cwd(), "data.db");
-  const dataFile = Bun.file(jsonDatabaseFile);
-  const jsonFileDoesNotExist =
-    !(await exists(jsonDatabaseFile)) ?? !dataFile.size;
-  if ((await exists(sqlDatabaseFile)) && jsonFileDoesNotExist) {
-    const db = new Database(sqlDatabaseFile);
-    const data: Meta = {
-      clicks: (
-        db
-          .query("SELECT count FROM clicks WHERE id = ?")
-          .get("toasted-clicker") as any
-      ).count,
-      history: (
-        db
-          .query("SELECT * FROM history WHERE clicker_id = ?")
-          .all("toasted-clicker") as any
-      ).map(({ created_at, count }: any) => ({
-        date: new Date(created_at).toISOString(),
-        count,
-      })),
-      countries: (
-        db
-          .query(
-            "SELECT * FROM country_clicks WHERE clicker_id = ? ORDER BY count DESC"
-          )
-          .all("toasted-clicker") as any
-      ).map(({ id, count }: any) => ({
-        id,
-        count,
-      })),
-    };
-    await Bun.write(jsonDatabaseFile, JSON.stringify(data));
+  if (!(await exists(databaseFile)) && (await exists(oldDatabaseFile))) {
+    const oldData: Meta = JSON.parse(
+      Buffer.from(await Bun.file(oldDatabaseFile).arrayBuffer()).toString()
+    );
+    await Bun.write(
+      databaseFile,
+      JSON.stringify({
+        clicks: oldData.clicks,
+        countries: oldData.countries,
+      })
+    );
+    await Bun.write(
+      analyticsFile,
+      "\n" +
+        oldData.history.map(({ date, count }) => `${date},${count}`).join("\n")
+    );
     return;
   }
-  if (jsonFileDoesNotExist) {
-    const data: Meta = {
-      clicks: 0,
-      history: [],
-      countries: [],
-    };
-    await Bun.write(jsonDatabaseFile, JSON.stringify(data));
+  if (!(await exists(databaseFile))) {
+    await Bun.write(
+      databaseFile,
+      JSON.stringify({
+        clicks: 0,
+        history: [],
+        countries: [],
+      })
+    );
     return;
   }
 }
 
 await initDatabase();
 
-const dataFile = Bun.file(jsonDatabaseFile);
+const dataFile = Bun.file(databaseFile);
 const db: Meta = JSON.parse(
   Buffer.from(await dataFile.arrayBuffer()).toString()
 );
@@ -78,11 +67,18 @@ export async function incrementClicks() {
 }
 
 export async function getHistory() {
-  return db.history;
+  const historyFile = Bun.file(analyticsFile);
+  const lines = (await historyFile.text()).split("\n");
+  lines.splice(0, 1);
+  const data = lines.map((line) => {
+    const [date, count] = line.split(",");
+    return { date: new Date(Number(date)).getTime(), count: Number(count) };
+  });
+  return data;
 }
 
 export async function addToHistory(clicks: number) {
-  db.history.push({ date: new Date().getTime(), count: clicks });
+  await appendFile(analyticsFile, `\n${new Date().getTime()},${clicks}`);
 }
 
 export async function getCountries() {
@@ -102,6 +98,14 @@ export async function addToCountryClicks(country: string) {
   db.countries[index].count += 1;
 }
 
+const dataBackupDir = join(dataDir, "backups");
+
 setInterval(async () => {
-  await Bun.write(jsonDatabaseFile, JSON.stringify(db));
+  await Bun.write(databaseFile, JSON.stringify(db));
+
+  if (!(await exists(dataBackupDir))) await mkdir(dataBackupDir);
+  await Bun.write(
+    join(dataBackupDir, `meta-${new Date().getTime()}.json`),
+    JSON.stringify(db)
+  );
 }, 10_000);

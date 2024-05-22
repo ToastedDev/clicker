@@ -177,3 +177,4 @@ dist
 # database
 data.db
 data.json
+data/
