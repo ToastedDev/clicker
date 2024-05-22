@@ -66,10 +66,25 @@ client.get("/", async (c) => {
   const countClass = css`
     font-family: "Yantramanav", sans-serif;
     font-weight: bold;
-    font-size: 5em;
+    font-size: 3rem;
     line-height: 1.1em;
     color: white;
     padding: 5px;
+    @media (min-width: 640px) {
+      & {
+        font-size: 4rem;
+      }
+    }
+    @media (min-width: 768px) {
+      & {
+        font-size: 4.5rem;
+      }
+    }
+    @media (min-width: 1024px) {
+      & {
+        font-size: 5rem;
+      }
+    }
   `;
   const buttonClass = css`
     font-family: "Inter", sans-serif;
