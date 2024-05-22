@@ -69,39 +69,19 @@ const db: Meta = JSON.parse(
   Buffer.from(await dataFile.arrayBuffer()).toString()
 );
 
-export async function getClicks() {
-  return db.clicks;
-}
-
-export async function incrementClicks() {
-  db.clicks += 1;
-}
-
-export async function getHistory() {
-  return db.history;
-}
-
-export async function addToHistory(clicks: number) {
-  db.history.push({ date: new Date().getTime(), count: clicks });
-}
-
-export async function getCountries() {
-  return [...db.countries].sort((a, b) => b.count - a.count);
-}
-
-export async function getCountry(country: string) {
-  return db.countries.find(({ id }) => id === country);
-}
-
-export async function addToCountryClicks(country: string) {
-  const index = db.countries.findIndex(({ id }) => id === country);
-  if (index === -1) {
-    db.countries.push({ id: country, count: 0 });
-    return;
+export async function fixDb() {
+  for (const history of db.history) {
+    const date = new Date(history.date);
+    if (history.count === 2560579) {
+      date.setHours(date.getHours() - 5);
+    }
+    if (history.count >= 3870782 && history.count < 4851472) {
+      date.setHours(date.getHours() + 5);
+    }
+    history.date = date.getTime();
+    console.log("Updated", date);
   }
-  db.countries[index].count += 1;
+  await Bun.write(jsonDatabaseFile, JSON.stringify(db, null, 2));
 }
 
-setInterval(async () => {
-  await Bun.write(jsonDatabaseFile, JSON.stringify(db));
-}, 10_000);
+fixDb();
