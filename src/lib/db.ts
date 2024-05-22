@@ -5,7 +5,7 @@ import { Database } from "bun:sqlite";
 interface Meta {
   clicks: number;
   history: {
-    date: string;
+    date: number;
     count: number;
   }[];
   countries: {
@@ -64,9 +64,9 @@ async function initDatabase() {
 
 await initDatabase();
 
-const dataFIle = Bun.file(jsonDatabaseFile);
+const dataFile = Bun.file(jsonDatabaseFile);
 const db: Meta = JSON.parse(
-  Buffer.from(await dataFIle.arrayBuffer()).toString()
+  Buffer.from(await dataFile.arrayBuffer()).toString()
 );
 
 export async function getClicks() {
@@ -82,7 +82,7 @@ export async function getHistory() {
 }
 
 export async function addToHistory(clicks: number) {
-  db.history.push({ date: new Date().toISOString(), count: clicks });
+  db.history.push({ date: new Date().getTime(), count: clicks });
 }
 
 export async function getCountries() {
