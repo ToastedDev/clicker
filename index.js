@@ -1,15 +1,31 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { redis } from "bun";
+import { client } from "./client";
 
 const app = new Hono().use(cors());
+
+app.route("/", client);
 
 const KV_PREFIX = "toasted-clicker";
 const CLICKS_KEY = `${KV_PREFIX}:clicks`;
 const COUNTRIES_PREFIX = `${KV_PREFIX}:country`;
 
-async function getClicks() {
+export async function getClicks() {
   return parseInt((await redis.get(CLICKS_KEY)) ?? 0);
+}
+
+export async function getCountries() {
+  const keys = await redis.keys(`${COUNTRIES_PREFIX}:*`);
+  if (keys.length > 0) {
+    const values = await redis.mget(...keys);
+    return values.map((clicks, index) => ({
+      code: keys[index].replace(`${COUNTRIES_PREFIX}:`, ""),
+      clicks: parseInt(clicks),
+    }));
+  } else {
+    return [];
+  }
 }
 
 if (!(await redis.exists(CLICKS_KEY))) await redis.set(CLICKS_KEY, 0);
@@ -21,18 +37,7 @@ app.get("/clicks", async (ctx) => {
 });
 
 app.get("/countries", async (ctx) => {
-  const keys = await redis.keys(`${COUNTRIES_PREFIX}:*`);
-  if (keys.length > 0) {
-    const values = await redis.mget(...keys);
-    return ctx.json(
-      values.map((clicks, index) => ({
-        code: keys[index].replace(`${COUNTRIES_PREFIX}:`, ""),
-        clicks: parseInt(clicks),
-      }))
-    );
-  } else {
-    return ctx.json([]);
-  }
+  return ctx.json(await getCountries());
 });
 
 app.post("/click", async (ctx) => {
