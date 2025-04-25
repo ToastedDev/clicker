@@ -8,7 +8,7 @@ import { Layout } from "./layout";
 
 export const client = new Hono();
 
-client.get("*", jsxRenderer(Layout()));
+client.get("*", jsxRenderer(Layout));
 
 function Script({ content }) {
   return <script dangerouslySetInnerHTML={{ __html: trim(content) }} />;
@@ -71,14 +71,104 @@ client.get("/", async (ctx) => {
             +1
           </button>
         </Card>
+        <Card>
+          <div id="chart" />
+        </Card>
       </main>
       <Script
         content={`
+          const chart = new Highcharts.chart({
+            chart: {
+              renderTo: "chart",
+              type: "line",
+              zoomType: "x",
+              panning: true,
+              panKey: "shift",
+              animation: true,
+              backgroundColor: "transparent",
+              plotBorderColor: "transparent",
+              resetZoomButton: {
+                theme: {
+                  fill: "#232323",
+                  stroke: "rgb(249, 115, 22)",
+                  r: 5,
+                  style: {
+                    color: "rgb(249, 115, 22)",
+                    fontSize: "12px",
+                    fontWeight: "bold",
+                  },
+                  states: {
+                    hover: {
+                      fill: "rgb(249, 115, 22)",
+                      style: {
+                        color: "#232323",
+                      },
+                    },
+                  },
+                },
+              },
+            },
+            title: {
+              text: "",
+            },
+            xAxis: {
+              type: "datetime",
+              tickPixelInterval: 500,
+              labels: {
+                style: {
+                  color: "#9a3412",
+                  fontFamily: '"Inter", sans-serif',
+                },
+              },
+              gridLineColor: "#9a3412",
+              lineColor: "#9a3412",
+              minorGridLineColor: "#9a3412",
+              tickColor: "#9a3412",
+              title: {
+                style: {
+                  color: "#9a3412",
+                },
+              },
+            },
+            yAxis: {
+              title: {
+                text: "",
+              },
+              labels: {
+                style: {
+                  color: "#9a3412",
+                  fontFamily: '"Inter", sans-serif',
+                },
+              },
+              gridLineColor: "#9a3412",
+              lineColor: "#9a3412",
+              minorGridLineColor: "#9a3412",
+              tickColor: "#9a3412",
+            },
+            credits: {
+              enabled: false,
+            },
+            series: [
+              {
+                showInLegend: false,
+                name: "",
+                marker: { enabled: false },
+                color: "black",
+                lineColor: "black",
+                lineWidth: 4,
+              },
+            ],
+          });
+
           setInterval(() => {
             fetch("/api/clicks")
               .then((res) => res.json())
               .then((data) => {
                 document.getElementById("count").textContent = data.clicks;
+
+                if (chart.series[0].points.length >= 3600)
+                  chart.series[0].data[0].remove();
+                chart.series[0].addPoint([Date.now(), parseInt(data.clicks)]);
               });
           }, 2000);
 
