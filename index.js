@@ -2,9 +2,11 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { redis } from "bun";
 import { client } from "./client";
+import { serveStatic } from "hono/bun";
 
 const app = new Hono().use(cors());
 
+app.get("/static/*", serveStatic({ root: "./" }));
 app.route("/", client);
 
 const KV_PREFIX = "toasted-clicker";
@@ -30,17 +32,17 @@ export async function getCountries() {
 
 if (!(await redis.exists(CLICKS_KEY))) await redis.set(CLICKS_KEY, 0);
 
-app.get("/clicks", async (ctx) => {
+app.get("/api/clicks", async (ctx) => {
   return ctx.json({
     clicks: await getClicks(),
   });
 });
 
-app.get("/countries", async (ctx) => {
+app.get("/api/countries", async (ctx) => {
   return ctx.json(await getCountries());
 });
 
-app.post("/click", async (ctx) => {
+app.post("/api/click", async (ctx) => {
   await redis.incr(CLICKS_KEY);
 
   const country = ctx.req.header("CF-IPCountry") ?? "XX";
