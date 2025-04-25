@@ -1,8 +1,7 @@
 import { Hono } from "hono";
 import { jsxRenderer } from "hono/jsx-renderer";
-import { getClicks, getCountries } from "..";
+import { getAnalytics, getClicks, getCountries } from "..";
 import { css, cx } from "hono/css";
-import trim from "trim-whitespace";
 import { baseCard, button, buttonAsCard, card, main } from "./css";
 import { Layout } from "./layout";
 import { countryCodes } from "./countries";
@@ -12,12 +11,96 @@ export const client = new Hono();
 client.get("*", jsxRenderer(Layout));
 
 function Script({ content }) {
-  return <script dangerouslySetInnerHTML={{ __html: trim(content) }} />;
+  return (
+    <script
+      dangerouslySetInnerHTML={{
+        __html: content
+          .split("\n")
+          .map((str) => str.trim())
+          .filter((str) => str.length)
+          .join("")
+          .replace(/\t/g, ""),
+      }}
+    />
+  );
 }
 
 function Card({ children }) {
   return <div class={card}>{children}</div>;
 }
+
+const chartStyles = `{
+  chart: {
+    renderTo: "chart",
+    type: "line",
+    zoomType: "x",
+    panning: true,
+    panKey: "shift",
+    animation: true,
+    backgroundColor: "transparent",
+    plotBorderColor: "transparent",
+    resetZoomButton: {
+      theme: {
+        fill: "#232323",
+        stroke: "rgb(249, 115, 22)",
+        r: 5,
+        style: {
+          color: "rgb(249, 115, 22)",
+          fontSize: "12px",
+          fontWeight: "bold",
+        },
+        states: {
+          hover: {
+            fill: "rgb(249, 115, 22)",
+            style: {
+              color: "#232323",
+            },
+          },
+        },
+      },
+    },
+  },
+  title: {
+    text: "",
+  },
+  xAxis: {
+    type: "datetime",
+    tickPixelInterval: 500,
+    labels: {
+      style: {
+        color: "#9a3412",
+        fontFamily: '"Inter", sans-serif',
+      },
+    },
+    gridLineColor: "#9a3412",
+    lineColor: "#9a3412",
+    minorGridLineColor: "#9a3412",
+    tickColor: "#9a3412",
+    title: {
+      style: {
+        color: "#9a3412",
+      },
+    },
+  },
+  yAxis: {
+    title: {
+      text: "",
+    },
+    labels: {
+      style: {
+        color: "#9a3412",
+        fontFamily: '"Inter", sans-serif',
+      },
+    },
+    gridLineColor: "#9a3412",
+    lineColor: "#9a3412",
+    minorGridLineColor: "#9a3412",
+    tickColor: "#9a3412",
+  },
+  credits: {
+    enabled: false,
+  },
+}`;
 
 client.get("/", async (ctx) => {
   const initialClicks = await getClicks();
@@ -73,30 +156,30 @@ client.get("/", async (ctx) => {
           </button>
         </Card>
         <div style="display: flex; align-items: center; gap: 0.5rem;">
-          {/* <a */}
-          {/*   href="/analytics" */}
-          {/*   class={buttonAsCard} */}
-          {/*   style="display: flex; flex-direction: row; align-items: center; gap: 0.25rem;" */}
-          {/* > */}
-          {/*   <svg */}
-          {/*     xmlns="http://www.w3.org/2000/svg" */}
-          {/*     width="24" */}
-          {/*     height="24" */}
-          {/*     viewBox="0 0 24 24" */}
-          {/*     fill="none" */}
-          {/*     stroke="currentColor" */}
-          {/*     stroke-width="2" */}
-          {/*     stroke-linecap="round" */}
-          {/*     stroke-linejoin="round" */}
-          {/*     style="width: 1.25rem; height: 1.25rem; margin-right: 0.25rem;" */}
-          {/*   > */}
-          {/*     <path d="M3 3v18h18" /> */}
-          {/*     <path d="M13 17V9" /> */}
-          {/*     <path d="M18 17V5" /> */}
-          {/*     <path d="M8 17v-3" /> */}
-          {/*   </svg> */}
-          {/*   View analytics */}
-          {/* </a> */}
+          <a
+            href="/analytics"
+            class={buttonAsCard}
+            style="display: flex; flex-direction: row; align-items: center; gap: 0.25rem;"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              style="width: 1.25rem; height: 1.25rem; margin-right: 0.25rem;"
+            >
+              <path d="M3 3v18h18" />
+              <path d="M13 17V9" />
+              <path d="M18 17V5" />
+              <path d="M8 17v-3" />
+            </svg>
+            View analytics
+          </a>
           <a
             href="/lb"
             class={buttonAsCard}
@@ -131,76 +214,7 @@ client.get("/", async (ctx) => {
       <Script
         content={`
           const chart = new Highcharts.chart({
-            chart: {
-              renderTo: "chart",
-              type: "line",
-              zoomType: "x",
-              panning: true,
-              panKey: "shift",
-              animation: true,
-              backgroundColor: "transparent",
-              plotBorderColor: "transparent",
-              resetZoomButton: {
-                theme: {
-                  fill: "#232323",
-                  stroke: "rgb(249, 115, 22)",
-                  r: 5,
-                  style: {
-                    color: "rgb(249, 115, 22)",
-                    fontSize: "12px",
-                    fontWeight: "bold",
-                  },
-                  states: {
-                    hover: {
-                      fill: "rgb(249, 115, 22)",
-                      style: {
-                        color: "#232323",
-                      },
-                    },
-                  },
-                },
-              },
-            },
-            title: {
-              text: "",
-            },
-            xAxis: {
-              type: "datetime",
-              tickPixelInterval: 500,
-              labels: {
-                style: {
-                  color: "#9a3412",
-                  fontFamily: '"Inter", sans-serif',
-                },
-              },
-              gridLineColor: "#9a3412",
-              lineColor: "#9a3412",
-              minorGridLineColor: "#9a3412",
-              tickColor: "#9a3412",
-              title: {
-                style: {
-                  color: "#9a3412",
-                },
-              },
-            },
-            yAxis: {
-              title: {
-                text: "",
-              },
-              labels: {
-                style: {
-                  color: "#9a3412",
-                  fontFamily: '"Inter", sans-serif',
-                },
-              },
-              gridLineColor: "#9a3412",
-              lineColor: "#9a3412",
-              minorGridLineColor: "#9a3412",
-              tickColor: "#9a3412",
-            },
-            credits: {
-              enabled: false,
-            },
+            ...${chartStyles},
             series: [
               {
                 showInLegend: false,
@@ -236,7 +250,7 @@ client.get("/", async (ctx) => {
   );
 });
 
-client.get("/lb", async (c) => {
+client.get("/lb", async (ctx) => {
   const countries = (await getCountries()).map((country) => ({
     id: country.code,
     name: countryCodes[country.code],
@@ -258,7 +272,7 @@ client.get("/lb", async (c) => {
     gap: 0.5rem;
   `;
 
-  return c.render(
+  return ctx.render(
     <>
       <main class={main}>
         <div style="display: flex; align-items: center; gap: 0.5rem; text-align: center; margin-inline: auto;">
@@ -340,5 +354,225 @@ client.get("/lb", async (c) => {
       </main>
     </>,
     { title: "Country Leaderboard" }
+  );
+});
+
+client.get("/analytics", async (ctx) => {
+  const analytics = await getAnalytics();
+  return ctx.render(
+    <>
+      <main class={main}>
+        <div style="display: flex; align-items: center; gap: 0.5rem; text-align: center; margin-inline: auto;">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width={56}
+            height={56}
+            viewBox="0 0 14 14"
+            style="color: #ff6900;"
+          >
+            <g fill="currentColor">
+              <path d="M9.5 4.5A2.5 2.5 0 0 0 7 2H2.5A2.5 2.5 0 0 0 1 6.5v5a1 1 0 0 0 1 1h5.5a1 1 0 0 0 1-1v-5a2.49 2.49 0 0 0 1-2"></path>
+              <path
+                fill-rule="evenodd"
+                d="M10.695 2.97a3.99 3.99 0 0 1-.226 3.525H13l.008-.001A2.49 2.49 0 0 0 14 4.5A2.5 2.5 0 0 0 11.5 2h-1.377c.235.294.428.62.572.97M13 7.743h-3V11.5a2.5 2.5 0 0 1-.209 1H12a1 1 0 0 0 1-1z"
+                clip-rule="evenodd"
+              ></path>
+            </g>
+          </svg>
+          <h1 style='font-size: 2rem; color: #ff6900; font-family: "Inter", sans-serif; letter-spacing: -0.05em;'>
+            Analytics
+          </h1>
+        </div>
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <a
+            href="/"
+            class={buttonAsCard}
+            style="display: flex; flex-direction: row; align-items: center; gap: 0.25rem;"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              style="width: 1.25rem; height: 1.25rem; margin-right: 0.25rem;"
+            >
+              <path d="m12 19-7-7 7-7" />
+              <path d="M19 12H5" />
+            </svg>
+            Go back to clicker
+          </a>
+          <button
+            href="/"
+            id="download-csv"
+            class={buttonAsCard}
+            style="display: flex; flex-direction: row; align-items: center; gap: 0.25rem;"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              style="width: 1.25rem; height: 1.25rem; margin-right: 0.25rem;"
+            >
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" x2="12" y1="15" y2="3" />
+            </svg>
+            Download data as CSV
+          </button>
+        </div>
+        {["minutely", "hourly", "daily"].map((chartType) => (
+          <Card>
+            <div id={`${chartType}-chart`} />
+          </Card>
+        ))}
+      </main>
+      <script
+        type="application/json"
+        id="analytics-data"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(analytics),
+        }}
+      />
+      <Script
+        content={`
+          const analyticsData = JSON.parse(
+            document.getElementById("analytics-data").textContent
+          ).map(([date, count]) => [new Date(date).getTime(), count]);
+
+          const chartStyles = ${chartStyles};
+
+          const createChart = ({ id, title = "", data }) =>
+            new Highcharts.chart({
+              ...chartStyles,
+              chart: Object.assign(chartStyles.chart, { renderTo: id }),
+              title: {
+                text: title,
+                style: {
+                  fontFamily: '"Inter", sans-serif',
+                  fontWeight: "600",
+                  letterSpacing: "-0.025em",
+                  color: "black",
+                },
+              },
+              series: [
+                {
+                  showInLegend: false,
+                  name: "",
+                  marker: { enabled: false },
+                  color: "black",
+                  lineColor: "black",
+                  lineWidth: 4,
+                  data,
+                },
+              ],
+            });
+
+          function convertToHourlyData(minuteData) {
+            const hourlyData = {};
+
+            minuteData.forEach((entry) => {
+              const date = new Date(entry[0]);
+              const value = entry[1];
+
+              const hourKey = date.toISOString().slice(0, 13);
+
+              if (!hourlyData[hourKey] || date > new Date(hourlyData[hourKey][0])) {
+                hourlyData[hourKey] = [entry[0], value];
+              }
+            });
+
+            const result = Object.entries(hourlyData).map(([key, [time, value]]) => {
+              const exactHourDate = new Date(time);
+              exactHourDate.setUTCMinutes(0, 0, 0);
+              return [exactHourDate.getTime(), value];
+            });
+
+            return result;
+          }
+
+          function convertToDailyData(minuteData) {
+            const dailyData = {};
+
+            minuteData.forEach((entry) => {
+              const date = new Date(entry[0]);
+              const value = entry[1];
+
+              const dayKey = date.toISOString().slice(0, 10);
+
+              if (!dailyData[dayKey] || date > new Date(dailyData[dayKey][0])) {
+                dailyData[dayKey] = [entry[0], value];
+              }
+            });
+
+            const result = Object.entries(dailyData).map(([key, [time, value]]) => {
+              const exactDayDate = new Date(time);
+              exactDayDate.setUTCHours(0, 0, 0, 0);
+              return [exactDayDate.getTime(), value];
+            });
+
+            return result;
+          }
+
+          createChart({
+            id: "minutely-chart",
+            title: "Minutely Clicks",
+            data: analyticsData,
+          });
+
+          createChart({
+            id: "hourly-chart",
+            title: "Hourly Clicks",
+            data: convertToHourlyData(analyticsData),
+          });
+
+          createChart({
+            id: "daily-chart",
+            title: "Daily Clicks",
+            data: convertToDailyData(analyticsData),
+          });
+
+          function convertDate(date) {
+            return (
+              date.toISOString().slice(0, 10) + " " + date.toISOString().slice(11, 16)
+            );
+          }
+
+          document.getElementById("download-csv").addEventListener("click", () => {
+            const csvText =
+              "Time (UTC),Clicks\\n" +
+              analyticsData
+                .map((entry) => [convertDate(new Date(entry[0])), entry[1]].join(","))
+                .join("\\n");
+            downloadCSVFile(csvText, "ToastedClickerAnalytics.csv");
+          });
+
+          function downloadCSVFile(csvText, fileName) {
+            const blob = new Blob([csvText], { type: "text/csv;charset=utf-8;" });
+            const link = document.createElement("a");
+            if (link.download !== undefined) {
+              const url = URL.createObjectURL(blob);
+              link.setAttribute("href", url);
+              link.setAttribute("download", fileName);
+              link.style.visibility = "hidden";
+              link.click();
+            } else {
+              window.open("data:text/csv;charset=utf-8," + encodeURIComponent(csvText));
+            }
+          }
+        `}
+      />
+    </>,
+    { title: "Analytics" }
   );
 });

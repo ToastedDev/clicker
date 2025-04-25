@@ -56,6 +56,7 @@ export const buttonAsCard = css`
   padding-block: 8px;
   font-family: "Inter", sans-serif;
   font-size: 14px;
+  border: none;
   border-radius: 5px;
   cursor: pointer;
   &:hover {

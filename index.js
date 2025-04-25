@@ -3,6 +3,7 @@ import { cors } from "hono/cors";
 import { redis } from "bun";
 import { client } from "./client";
 import { serveStatic } from "hono/bun";
+import { CronJob } from "cron";
 
 const app = new Hono().use(cors());
 
@@ -57,3 +58,42 @@ Bun.serve({
   fetch: app.fetch,
   port: process.env.PORT || 3000,
 });
+
+import fs from "fs";
+
+const ANALYTICS_FILE = "./analytics.csv";
+
+async function updateAnalytics() {
+  const clicks = await getClicks();
+
+  if (!fs.existsSync(ANALYTICS_FILE))
+    fs.writeFileSync(
+      ANALYTICS_FILE,
+      `date,count\n${new Date().toISOString()},${clicks}`
+    );
+  else
+    fs.appendFileSync(
+      ANALYTICS_FILE,
+      `\n${new Date().toISOString()},${clicks}`
+    );
+
+  console.log("Updated analytics", new Date().toISOString());
+}
+
+export async function getAnalytics() {
+  const text = fs.readFileSync(ANALYTICS_FILE, "utf-8");
+  return text
+    .trim()
+    .split("\n")
+    .filter((str) => str.toLowerCase() !== "date,clicks")
+    .map((str) => [str.split(",")[0], parseInt(str.split(",")[1])]);
+}
+
+const cronJob = new CronJob(
+  "* * * * *",
+  updateAnalytics,
+  null,
+  true,
+  "Africa/Abidjan"
+);
+cronJob.start();
