@@ -33,6 +33,28 @@ export const button = css`
   color: black;
   padding-inline: 16px;
   padding-block: 8px;
+  font-family: "Inter", sans-serif;
+  font-size: 14px;
+  border-radius: 5px;
+  cursor: pointer;
+  &:hover {
+    box-shadow: 0 0 #0000;
+    translate: 4px 4px;
+  }
+`;
+export const buttonAsCard = css`
+  ${card}
+  font-family: "Inter", sans-serif;
+  display: block;
+  text-align: center;
+  text-decoration: none;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 4px 4px 0px 0px black;
+  background-color: #ff6900;
+  color: black;
+  padding-inline: 16px;
+  padding-block: 8px;
+  font-family: "Inter", sans-serif;
   font-size: 14px;
   border-radius: 5px;
   cursor: pointer;
