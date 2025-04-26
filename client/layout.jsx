@@ -17,19 +17,16 @@ export function Layout({ children, title }) {
         <meta name="description" content={description} />
         <meta property="og:title" content={title} />
         <meta property="og:description" content={description} />
-        <meta property="og:url" content="https://toasted.is-a.dev/" />
+        <meta property="og:url" content="https://toasted.dev/" />
         <meta property="og:type" content="website" />
         <meta name="twitter:creator" content="@ToastedDev" />
         <meta name="twitter:creator:id" content="1145171094556426240" />
         <meta name="twitter:title" content={title} />
         <meta name="twitter:description" content={description} />
-        <meta property="og:image" content="https://toasted.is-a.dev/logo.png" />
-        <meta
-          name="twitter:image"
-          content="https://toasted.is-a.dev/logo.png"
-        />
+        <meta property="og:image" content="https://toasted.dev/logo.png" />
+        <meta name="twitter:image" content="https://toasted.dev/logo.png" />
         <meta name="twitter:card" content="summary" />
-        <meta name="theme-color" content="#f97316" />
+        <meta name="theme-color" content="#ff6900" />
         <link rel="stylesheet" href="/static/odometer.css" />
         <script src="/static/odometer.js" />
         <script src="https://code.highcharts.com/10.3.3/highcharts.js" />
