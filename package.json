@@ -3,15 +3,20 @@
   "module": "index.js",
   "type": "module",
   "private": true,
-  "devDependencies": {
-    "@types/bun": "latest"
-  },
-  "peerDependencies": {
-    "typescript": "^5.8.3"
+  "scripts": {
+    "start": "bun src/index.ts",
+    "coming-soon": "bun src/coming-soon.tsx",
+    "dev": "bun --hot src/index.ts"
   },
   "dependencies": {
     "cron": "^4.3.0",
     "hono": "^4.7.7",
     "trim-whitespace": "^1.3.3"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.8.3"
   }
 }
