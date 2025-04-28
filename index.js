@@ -22,10 +22,12 @@ export async function getCountries() {
   const keys = await redis.keys(`${COUNTRIES_PREFIX}:*`);
   if (keys.length > 0) {
     const values = await redis.mget(...keys);
-    return values.map((clicks, index) => ({
-      code: keys[index].replace(`${COUNTRIES_PREFIX}:`, ""),
-      clicks: parseInt(clicks),
-    })).sort((a, b) => b.clicks - a.clicks);
+    return values
+      .map((clicks, index) => ({
+        code: keys[index].replace(`${COUNTRIES_PREFIX}:`, ""),
+        clicks: parseInt(clicks),
+      }))
+      .sort((a, b) => b.clicks - a.clicks);
   } else {
     return [];
   }
@@ -54,14 +56,30 @@ app.post("/api/click", async (ctx) => {
   return ctx.text("OK", 204);
 });
 
+const ANALYTICS_FILE = "./analytics.csv";
+export async function getAnalytics() {
+  const text = fs.readFileSync(ANALYTICS_FILE, "utf-8");
+  return text
+    .trim()
+    .split("\n")
+    .slice(1)
+    .map((str) => [str.split(",")[0], parseInt(str.split(",")[1])]);
+}
+
+app.get("/api/analytics", async (ctx) => {
+  const analytics = await getAnalytics();
+  if (ctx.req.query("hour") === "true") {
+    return ctx.json(analytics.slice(-60));
+  }
+  return ctx.json(analytics);
+});
+
 Bun.serve({
   fetch: app.fetch,
   port: parseInt(process.env.PORT ?? "3000"),
 });
 
 import fs from "fs";
-
-const ANALYTICS_FILE = "./analytics.csv";
 
 async function updateAnalytics() {
   const clicks = await getClicks();
@@ -78,15 +96,6 @@ async function updateAnalytics() {
     );
 
   console.log("Updated analytics", new Date().toISOString());
-}
-
-export async function getAnalytics() {
-  const text = fs.readFileSync(ANALYTICS_FILE, "utf-8");
-  return text
-    .trim()
-    .split("\n")
-    .slice(1)
-    .map((str) => [str.split(",")[0], parseInt(str.split(",")[1])]);
 }
 
 const cronJob = new CronJob(
