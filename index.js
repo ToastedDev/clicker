@@ -56,7 +56,7 @@ app.post("/api/click", async (ctx) => {
 
 Bun.serve({
   fetch: app.fetch,
-  port: process.env.PORT || 3000,
+  port: parseInt(process.env.PORT ?? "3000"),
 });
 
 import fs from "fs";
