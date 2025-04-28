@@ -25,7 +25,7 @@ export async function getCountries() {
     return values.map((clicks, index) => ({
       code: keys[index].replace(`${COUNTRIES_PREFIX}:`, ""),
       clicks: parseInt(clicks),
-    }));
+    })).sort((a, b) => b.clicks - a.clicks);
   } else {
     return [];
   }
