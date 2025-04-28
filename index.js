@@ -84,6 +84,7 @@ export async function getAnalytics() {
   const text = fs.readFileSync(ANALYTICS_FILE, "utf-8");
   return text
     .trim()
+    .slice(1)
     .split("\n")
     .filter((str) => str.toLowerCase() !== "date,clicks")
     .map((str) => [str.split(",")[0], parseInt(str.split(",")[1])]);
